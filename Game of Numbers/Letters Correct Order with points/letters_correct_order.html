@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphabet Game</title>
+    <style>
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 300px; /* Adjust based on the desired layout */
+            margin: auto;
+        }
+        .letter-button {
+            width: 30px;
+            height: 30px;
+            margin: 5px;
+            font-size: 16px;
+            border: 1px solid #000; /* Border to maintain a visible button even when disabled */
+            background-color: #f0f0f0;
+            cursor: pointer;
+            user-select: none;
+        }
+        .letter-button:active {
+            background-color: #f0f0f0; /* Keep the background color the same when pressed */
+            border: 1px solid #000; /* Keep border color the same when pressed */
+        }
+        .letter-button:disabled {
+            background-color: #f0f0f0; /* Keep the background color the same when disabled */
+            border: 1px solid #000; /* Keep border color the same when disabled */
+            cursor: default;
+            pointer-events: none; /* Prevent any interaction when disabled */
+        }
+        .counter, .timer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container" id="button-container"></div>
+    <div class="counter">Score: <span id="score">0</span></div>
+    <div class="timer">Time left: <span id="timer">60</span> seconds</div>
+
+    <script>
+        // Create an array of letters from A to Z
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+        // Function to shuffle the array
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Shuffle the letters
+        const shuffledLetters = shuffle([...letters]);
+
+        // Get the container to hold the buttons
+        const buttonContainer = document.getElementById('button-container');
+        const scoreLabel = document.getElementById('score');
+        const timerLabel = document.getElementById('timer');
+        let currentLetterIndex = 0;
+        let score = 0;
+        let timeLeft = 60;
+        let timerInterval;
+
+        // Create buttons for each letter and add them to the container
+        shuffledLetters.forEach(letter => {
+            const button = document.createElement('button');
+            button.textContent = letter;
+            button.className = 'letter-button';
+            button.onclick = () => handleLetterClick(letter, button);
+            buttonContainer.appendChild(button);
+        });
+
+        // Function to handle letter click
+        function handleLetterClick(letter, button) {
+            if (letter === letters[currentLetterIndex]) {
+                score++;
+                currentLetterIndex++;
+                scoreLabel.textContent = score;
+                button.disabled = true; // Disable the button once it has been clicked correctly
+            }
+
+            if (currentLetterIndex === letters.length) {
+                clearInterval(timerInterval);
+                alert('Congratulations! You clicked all letters in the correct order!');
+            }
+        }
+
+        // Function to start the timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerLabel.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Time\'s up! Your score is: ' + score);
+                    disableAllButtons();
+                }
+            }, 1000);
+        }
+
+        // Function to disable all buttons
+        function disableAllButtons() {
+            const buttons = document.querySelectorAll('.letter-button');
+            buttons.forEach(button => button.disabled = true);
+        }
+
+        // Start the timer when the page loads
+        window.onload = startTimer;
+    </script>
+</body>
+</html>
